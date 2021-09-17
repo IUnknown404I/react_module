@@ -1,0 +1,12 @@
+.mySelect {
+    width: 150px;
+    height: 30px;
+    cursor: pointer;
+    background: transparent;
+    border: 1px solid teal;
+}
+
+.mySelect:hover {
+    background: azure;
+    border: 1px solid cadetblue;
+}

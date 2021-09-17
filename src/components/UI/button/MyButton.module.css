@@ -1,0 +1,17 @@
+.myBtn {
+    padding: 5px 15px;
+    color: darkslategray;
+    font-size: 14px;
+    background: azure;
+    border: 1px solid teal;
+    cursor: pointer;
+}
+.myBtn:hover {
+    background: azure;
+    border: 1px solid blueviolet;
+}
+.myBtn:disabled {
+    background: lightgrey;
+    color: grey;
+    cursor: auto;
+}
