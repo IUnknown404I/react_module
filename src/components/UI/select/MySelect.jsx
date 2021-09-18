@@ -8,13 +8,16 @@ const MySelect = ({options, defaultValue, value, onChange}) => {
             className={classes.mySelect}
             onChange={event => event.target.value ? onChange(event.target.value):void(0)}
         >
-            <option value={defaultValue} disabled>{defaultValue} </option>
-            <option/>
-            {options.map(option =>
-                <option key={option.value} value={option.value}>
-                    {option.name}
-                </option>
-            )}
+            <optgroup label={defaultValue}>
+
+                <option value='' disabled>Выберите опцию</option>
+                {options.map(option =>
+                    <option key={option.value} value={option.value}>
+                        {option.name}
+                    </option>
+                )}
+
+            </optgroup>
         </select>
     );
 };

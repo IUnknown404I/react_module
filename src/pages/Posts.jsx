@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import '../styles/App.css'
 import {usePosts} from "../hooks/usePosts";
 import {getPagesCount} from "../utils/pages";
@@ -11,6 +11,7 @@ import PostList from "../components/PostList";
 import Pagination from "../components/UI/pagination/Pagination";
 import Loader from "../components/UI/Loader/Loader";
 import PostService from "../API/PostService";
+import {useObserver} from "../hooks/useObserver";
 
 function Posts() {
     const [posts, setPosts] = useState([]);
@@ -21,30 +22,53 @@ function Posts() {
     const [page, setPage] = useState(1);
     const sortedForSearchPosts = usePosts(posts, filter.sort, filter.query);
 
+    const lastElement = useRef();
+
     const [fetchPosts, isPostsLoading, postsError] = useFetching(async () => {
         const response = await PostService.getAll(limit, page);
-        setPosts(response.data);
+        setPosts([...posts, ...response.data]);
 
         const totalCount = response.headers['x-total-count'];
         setTotalPages(getPagesCount(totalCount, limit));
     });
 
-    useEffect(() => {
-        fetchPosts()
-    }, [page]);
-
     const changePage = (newPage) => {
         setPage(newPage);
     }
-
     const createPost = (post) => {
         setPosts([...posts, post]);
         setModal(false);
     };
-
     const removePost = (post) => {
         setPosts(posts.filter(p => p.id !== post.id));
     };
+    const clearPosts = () => {
+        setPosts([]);
+    }
+    const changePageByButtons = (newPage) => {
+        clearPosts();
+        setPage(newPage);
+    }
+
+    useEffect(() => {
+        clearPosts();
+        console.log("page before clearing: " + page)
+        setPage(1);
+    }, [limit]);
+
+    useEffect(() => {
+        fetchPosts(limit, page);
+    }, [page]);
+
+    useEffect(() => {
+        console.log(page)
+    }, [page]);
+
+
+    useObserver(lastElement, page < totalPages, isPostsLoading, () => {
+        console.log("page before useObserver incrementing: " + page)
+        setPage(page + 1);
+    });
 
 
     return (
@@ -60,6 +84,8 @@ function Posts() {
             <PostFilter
                 filter={filter}
                 setFilter={setFilter}
+                limit={limit}
+                setLimit={setLimit}
             />
             <hr style={{margin: '25px 0'}}/>
 
@@ -69,13 +95,14 @@ function Posts() {
             </h1>
             }
 
-            { isPostsLoading
-                ? <div style={{display: 'flex', justifyContent: 'center', marginTop: '50px'}}><Loader/></div>
-                : <PostList remove={removePost} posts={sortedForSearchPosts} title='Листинг текущих постов'/>
+            { isPostsLoading &&
+                <div style={{display: 'flex', justifyContent: 'center', marginTop: '50px'}}><Loader/></div>
             }
+            <PostList remove={removePost} posts={sortedForSearchPosts} title='Листинг текущих постов'/>
+            <div ref={lastElement} style={{marginTop: '0', width: '100%'}}/>
 
             <Pagination
-                changePage={changePage}
+                changePage={changePageByButtons}
                 page={page}
                 totalPages={totalPages}>
             </Pagination>

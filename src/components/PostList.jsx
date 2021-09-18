@@ -20,7 +20,7 @@ const PostList = ({title, posts, remove}) => {
                         timeout={650}
                         classNames="post"
                     >
-                        <PostItem remove={remove} post={post}/>
+                        <PostItem remove={remove} post={post} index={index}/>
                     </CSSTransition>
                 )}
             </TransitionGroup>
